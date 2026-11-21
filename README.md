@@ -20,6 +20,8 @@ A real-time auction platform. The bidding core is correct under concurrency, all
 - **Idempotent bids:** a retried request with the same `bidId` is never counted twice, even across restarts.
 - **Batched real-time fan-out:** at most 10 messages/sec per auction, each with full state.
 - **Per-bidder rate limiting,** live metrics, and a built-in **stress test + invariant checker**.
+- **Simulated bidders switch:** demo bots can be turned on or off at runtime from the lot page or System page (`POST /api/demo/bots`). Turn them off to bid alone and win a lot.
+- **Bidder names must contain letters** (e.g. `riya_k`, not `1233`), enforced by the engine and checked in the browser.
 
 ---
 
@@ -40,10 +42,11 @@ A real-time auction platform. The bidding core is correct under concurrency, all
 npm install
 npm run demo     # fresh demo data + simulated bidders → http://localhost:3000
 npm start        # same server, no bots, keeps data/lotline.db between restarts
-npm test         # 28 tests: engine rules, auto-bid, reserve, timing, replay, HTTP concurrency, SQLite storage, restart
+npm test         # 30 tests: engine rules, auto-bid, reserve, timing, replay, HTTP concurrency, SQLite storage, restart, bots switch, name rule
 ```
 
 Things to try:
+- Want to **win a lot**? Flip **Simulated bidders** off in the bid panel, place a bid, and let the clock run out.
 - Open a lot in **two browser windows** and bid from both. The price, history and countdown update live in each.
 - Turn on **auto-bid** with a high max, then out-bid yourself from the other window to watch the proxy answer instantly.
 - Bid in the **last 30 seconds**: the clock extends and a banner appears for everyone watching.
@@ -76,6 +79,7 @@ Things to try:
 | `GET` | `/api/users/:name/activity` | a bidder's lots and state (hidden maximums are never exposed) |
 | `GET` | `/api/auctions/:id/history?limit=` | full bid history, read from SQLite |
 | `GET` | `/api/db` | database table counts + latest stored bids |
+| `GET` `POST` | `/api/demo/bots` | read / set `{ enabled: true \| false }` for the simulated bidders |
 | `GET` | `/api/stats` · `/api/time` | metrics · server clock |
 
 WebSocket rooms: `auction:<id>` (`auction:snapshot`, `auction:update`, `auction:closed`), `lobby` (`lobby:snapshot`, `lobby:update`), `stats`.
@@ -109,5 +113,6 @@ test/              engine tests with a fake clock; HTTP, rate-limit and restart 
 - Postgres/Kafka in place of SQLite, with log compaction or snapshots
 - Horizontal scale-out: shard owners + gateway tier as in the design note
 - Payments and seller payouts after a win, plus a notification service ("you've been outbid" email or push)
-#   t e c h _ a h i r  
+#   t e c h _ a h i r 
+ 
  
