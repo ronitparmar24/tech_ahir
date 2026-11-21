@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>My bids · Lotline</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/app.css" />
+  <link rel="stylesheet" href="/css/pages.css" />
+</head>
+<body>
+  <div class="backdrop" aria-hidden="true"><i></i><i></i><i></i></div>
+
+  <main class="wrap">
+    <div class="profile reveal" id="profile"></div>
+
+    <div class="tiles reveal" style="--i:1">
+      <div class="tile glass"><div class="label"><span data-icon="trophy" style="display:flex"></span>Winning now</div><div class="value" id="tLeading">0</div><div class="sub">live lots you lead</div></div>
+      <div class="tile glass"><div class="label"><span data-icon="alert" style="display:flex"></span>Outbid</div><div class="value" id="tOutbid">0</div><div class="sub">still live: bid again</div></div>
+      <div class="tile glass"><div class="label"><span data-icon="check" style="display:flex"></span>Won</div><div class="value" id="tWon">0</div><div class="sub" id="tWonValue">₹0 total</div></div>
+      <div class="tile glass"><div class="label"><span data-icon="heart" style="display:flex"></span>Watching</div><div class="value" id="tWatch">0</div><div class="sub">saved on this device</div></div>
+    </div>
+
+    <div class="section-head">
+      <div class="seg" id="tabs" role="tablist" aria-label="Activity">
+        <button class="active" data-value="active">Active <span class="count" data-count="active">0</span></button>
+        <button data-value="won">Won <span class="count" data-count="won">0</span></button>
+        <button data-value="lost">Lost <span class="count" data-count="lost">0</span></button>
+        <button data-value="watching">Watching <span class="count" data-count="watching">0</span></button>
+      </div>
+      <span class="small faint">Updates live</span>
+    </div>
+
+    <div class="act-list" id="list"></div>
+  </main>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script type="module" src="/js/activity.js"></script>
+</body>
+</html>

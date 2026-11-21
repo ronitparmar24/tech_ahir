@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Lot · Lotline</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/app.css" />
+  <link rel="stylesheet" href="/css/pages.css" />
+</head>
+<body>
+  <div class="backdrop" aria-hidden="true"><i></i><i></i><i></i></div>
+
+  <main class="wrap">
+    <a class="back" href="/"><span data-icon="back" style="display:flex"></span>All lots</a>
+
+    <div class="detail" id="detail">
+      <!-- art -->
+      <section class="a-art">
+        <div class="art hero-art" id="art">
+          <span id="badge"></span>
+          <div class="art-actions">
+            <button class="icon-btn" id="shareBtn" type="button" aria-label="Copy link"><span data-icon="link" style="display:flex"></span></button>
+            <button class="icon-btn" id="watchBtn" type="button" aria-label="Watch"><span data-icon="heart" style="display:flex"></span></button>
+          </div>
+          <span class="badge art-watchers" style="color:var(--text)"><span data-icon="eye" style="display:flex;width:13px"></span><b id="watchers">0</b>&nbsp;watching</span>
+        </div>
+        <script>
+          // Runs before first paint so the card art can morph into this one (cross-page view transition).
+          (function () {
+            var id = new URLSearchParams(location.search).get('id') || '';
+            var art = document.getElementById('art');
+            var P = [['#ece8e1','#d6cfc3','#3d3a35'],['#f0e2d8','#d9b8a3','#5a3a2a'],['#e3e8df','#bfcab6','#33402f'],['#e1e5ea','#b7c0cb','#2f3a46'],['#f1e9d6','#dccaa0','#4d4128'],['#dedcd8','#b3b0aa','#2a2a28'],['#e7e6d6','#c4c29d','#3f3e27'],['#efdfd6','#cf9f88','#4f2a1c']];
+            var p = P[5];
+            try { var peek = JSON.parse(sessionStorage.getItem('lotline.peek') || 'null'); if (peek && peek.id === id) p = P[peek.palette % 8] || p; } catch (e) {}
+            art.style.cssText = '--c1:' + p[0] + ';--c2:' + p[1] + ';--c3:' + p[2];
+            if (/^[a-z0-9][a-z0-9-]*$/i.test(id)) art.style.viewTransitionName = 'art-' + id;
+          })();
+        </script>
+      </section>
+
+      <!-- bid panel -->
+      <aside class="a-panel">
+        <div class="panel glass glass-strong pad-lg reveal" id="panel">
+          <div class="row between">
+            <span class="label" id="catLabel">—</span>
+            <span class="small faint" id="lotId"></span>
+          </div>
+          <h1 id="title">Loading…</h1>
+          <div class="seller" id="seller"></div>
+
+          <div class="price-block">
+            <div class="row between">
+              <div class="label" id="priceLabel">Current bid</div>
+              <span id="reservePill"></span>
+            </div>
+            <div class="price-xl" id="price" data-value="0">—</div>
+            <div class="leader-line" id="leader"></div>
+          </div>
+
+          <div id="extSlot"></div>
+          <div id="resultSlot"></div>
+
+          <div class="timer-block">
+            <div class="tring" id="ring">
+              <svg viewBox="0 0 120 120" aria-hidden="true">
+                <circle class="track" cx="60" cy="60" r="52" fill="none" stroke-width="6" />
+                <circle class="bar" id="ringBar" cx="60" cy="60" r="52" fill="none" stroke-width="6" stroke-linecap="round" stroke-dasharray="326.73" stroke-dashoffset="0" />
+              </svg>
+              <div class="ring-ic"><span data-icon="clock" style="display:flex"></span></div>
+            </div>
+            <div class="timer-text">
+              <div class="label" id="timeLabel">Ends in</div>
+              <div class="countdown" id="countdown" data-countdown>—</div>
+              <div class="small faint" id="endsAt"></div>
+            </div>
+          </div>
+
+          <div class="status-row" id="myStatus"></div>
+
+          <form id="bidForm" autocomplete="off">
+            <div class="quick" id="quick"></div>
+            <div class="stepper">
+              <button class="icon-btn" type="button" id="dec" aria-label="Decrease"><span data-icon="minus" style="display:flex"></span></button>
+              <label class="input-affix">
+                <span class="money">₹</span>
+                <input class="input money-input" id="amount" type="number" inputmode="numeric" min="1" step="1" aria-label="Your bid" />
+              </label>
+              <button class="icon-btn" type="button" id="inc" aria-label="Increase"><span data-icon="plus" style="display:flex"></span></button>
+            </div>
+
+            <div class="auto-row">
+              <div>
+                <div style="font-weight:600;font-size:14px">Auto-bid</div>
+                <div class="small faint">We bid for you, only as much as needed, up to your max.</div>
+              </div>
+              <label class="switch"><input type="checkbox" id="autoToggle" /><span class="track"></span></label>
+            </div>
+            <div class="auto-box" id="autoBox">
+              <div>
+                <label class="input-affix" style="display:block">
+                  <span class="money">₹</span>
+                  <input class="input money-input" id="maxAmount" type="number" inputmode="numeric" min="1" step="1" placeholder="Your maximum" aria-label="Auto-bid maximum" />
+                </label>
+                <div class="small faint" style="margin-top:8px" id="maxHint">Your maximum stays private.</div>
+              </div>
+            </div>
+
+            <button class="btn btn-primary btn-lg btn-block" id="bidBtn" type="submit"><span data-icon="gavel" style="display:flex"></span><span id="bidBtnText">Place bid</span></button>
+          </form>
+
+          <div class="fine"><span data-icon="shield"></span><span id="fine">Bids are binding. A bid in the last 30 seconds adds 30 seconds to the clock.</span></div>
+          <div id="botsSlot"></div>
+        </div>
+      </aside>
+
+      <!-- description & details -->
+      <section class="a-info glass pad-lg reveal" style="--i:2">
+        <div class="label">About this lot</div>
+        <p class="desc" id="desc"></p>
+        <div class="kv" id="kv"></div>
+      </section>
+
+      <!-- history -->
+      <section class="a-history glass pad-lg reveal" style="--i:3">
+        <div class="row between">
+          <div>
+            <div class="label">Bid history</div>
+            <div class="h3" style="margin-top:4px"><span id="bidCount">0</span> bids · <span id="bidderCount">0</span> bidders</div>
+          </div>
+          <a class="btn btn-sm" id="verifyLink" href="#"><span data-icon="shield" style="display:flex"></span>Verify</a>
+        </div>
+        <ul class="hist" id="hist"></ul>
+        <div class="empty hide" id="histEmpty" style="padding:30px 10px"><p class="muted" style="margin:0">No bids yet. Be the first.</p></div>
+      </section>
+    </div>
+  </main>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script type="module" src="/js/auction.js"></script>
+</body>
+</html>

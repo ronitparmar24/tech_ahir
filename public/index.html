@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Lotline · Live Auctions</title>
+  <meta name="description" content="Real-time auctions with auto-bidding, anti-sniping extensions and server-verified results." />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/app.css" />
+  <link rel="stylesheet" href="/css/pages.css" />
+</head>
+<body>
+  <div class="backdrop" aria-hidden="true"><i></i><i></i><i></i></div>
+
+  <main class="wrap">
+    <section class="hero">
+      <div class="reveal">
+        <span class="eyebrow"><span class="dot"></span><span><b id="hLive">0</b> lots live now · <b id="hWatching">0</b> watching</span></span>
+        <h1 class="display" style="margin-top:16px">Live auctions,<br /><span class="grad">settled fairly.</span></h1>
+        <p class="lead">Watches, cameras, art and collectibles, bid on in real time. A late bid adds 30 seconds, so nobody wins by sniping the last instant.</p>
+        <div class="hero-cta">
+          <a class="btn btn-primary btn-lg" href="#lots" id="ctaExplore">Browse live lots</a>
+          <a class="btn btn-lg" href="/sell">Sell an item</a>
+        </div>
+        <div class="hero-stats">
+          <div><b id="hBids">0</b><span>bids in the last minute</span></div>
+          <div><b id="hUpcoming">0</b><span>starting soon</span></div>
+          <div><b id="hEnded">0</b><span>auctions settled</span></div>
+        </div>
+      </div>
+
+      <div class="featured-wrap reveal" style="--i:2">
+        <div class="featured-tag"><span class="label">Closing next</span><a class="small muted" href="#lots">View all lots →</a></div>
+        <div id="featured"><div class="skeleton" style="min-height:420px"></div></div>
+      </div>
+    </section>
+
+    <div class="section-head" id="lots">
+      <div>
+        <div class="label">Marketplace</div>
+        <h2 class="h2" style="margin-top:4px">Browse lots</h2>
+      </div>
+      <div class="seg" id="statusSeg" role="tablist" aria-label="Filter by status">
+        <button class="active" data-value="live">Live <span class="count" data-count="live">0</span></button>
+        <button data-value="ending">Ending soon <span class="count" data-count="ending">0</span></button>
+        <button data-value="upcoming">Upcoming <span class="count" data-count="upcoming">0</span></button>
+        <button data-value="ended">Ended <span class="count" data-count="ended">0</span></button>
+        <button data-value="all">All</button>
+      </div>
+    </div>
+
+    <div class="controls">
+      <label class="input-affix search">
+        <span class="affix" data-icon="search"></span>
+        <input class="input" id="q" type="search" placeholder="Search lots, sellers…" autocomplete="off" />
+      </label>
+      <select class="select" id="sort" aria-label="Sort">
+        <option value="ending">Ending soonest</option>
+        <option value="bids">Most bids</option>
+        <option value="price">Highest price</option>
+        <option value="newest">Newest</option>
+      </select>
+    </div>
+    <div class="chips cat-row" id="cats"></div>
+
+    <div class="grid" id="grid">
+      <div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div>
+    </div>
+    <div class="empty glass hide" id="empty">
+      <span data-icon="search"></span>
+      <h3>No lots match</h3>
+      <p class="muted">Try another filter, or <a href="/sell" style="color:var(--accent-2)">list something yourself</a>.</p>
+    </div>
+
+    <div class="section-head"><div><div class="label">Fair by design</div><h2 class="h2" style="margin-top:6px">How bidding works</h2></div></div>
+    <div class="how">
+      <div class="reveal" style="--i:1"><div class="ic" data-icon="bolt"></div><h3>Bid, or set a max</h3><p>Place a bid, or give a maximum and the auto-bidder raises for you only as much as needed to stay in front.</p></div>
+      <div class="reveal" style="--i:2"><div class="ic" data-icon="clock"></div><h3>No last-second sniping</h3><p>Any bid in the final 30 seconds adds 30 seconds, so everyone gets a fair chance to respond.</p></div>
+      <div class="reveal" style="--i:3"><div class="ic" data-icon="shield"></div><h3>The server decides</h3><p>Bids are processed one at a time per lot, timed by the server clock, written to a log, and checkable on the System page.</p></div>
+    </div>
+
+    <footer class="footer"><span>Lotline: real-time auctions</span><span>Node.js · Express · Socket.io · SQLite</span></footer>
+  </main>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script type="module" src="/js/explore.js"></script>
+</body>
+</html>

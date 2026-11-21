@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Sell · Lotline</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/app.css" />
+  <link rel="stylesheet" href="/css/pages.css" />
+</head>
+<body>
+  <div class="backdrop" aria-hidden="true"><i></i><i></i><i></i></div>
+
+  <main class="wrap">
+    <div class="reveal" style="margin:10px 0 26px">
+      <span class="eyebrow"><span data-icon="sparkle" style="display:flex;width:15px"></span>Seller studio</span>
+      <h1 class="display" style="font-size:clamp(2rem,4vw,3.1rem);margin-top:14px">List an item in <span class="grad">under a minute</span></h1>
+      <p class="muted" style="max-width:560px;margin:12px 0 0">Set a starting price, an optional hidden reserve and a duration. Bidders see it live the moment you publish.</p>
+    </div>
+
+    <div class="sell-grid">
+      <form id="sellForm" novalidate>
+        <section class="form-section glass reveal" style="--i:1">
+          <h2><span class="n">1</span>The item</h2>
+          <p>What are you selling?</p>
+          <div class="form-grid">
+            <label class="field full"><span>Title</span>
+              <input class="input" id="title" maxlength="80" placeholder="e.g. 1970s film camera with 50mm lens" />
+              <span class="err" data-err="title"></span>
+            </label>
+            <label class="field full"><span>Description</span>
+              <textarea class="textarea" id="description" maxlength="1000" placeholder="Condition, history, what's included…"></textarea>
+              <span class="tiny faint" id="descCount">0 / 1000</span>
+            </label>
+            <div class="field full"><span>Category</span><div class="cat-pick" id="catPick"></div></div>
+            <div class="field full"><span>Cover style</span><div class="swatches" id="swatches"></div></div>
+          </div>
+        </section>
+
+        <section class="form-section glass reveal" style="--i:2">
+          <h2><span class="n">2</span>Pricing</h2>
+          <p>Whole rupees only. Integer money means no rounding surprises.</p>
+          <div class="form-grid">
+            <label class="field"><span>Starting bid</span>
+              <span class="input-affix"><span class="money" style="font-size:16px;left:14px">₹</span><input class="input" style="padding-left:32px" id="startingPrice" type="number" min="1" step="1" value="5000" /></span>
+              <span class="err" data-err="startingPrice"></span>
+            </label>
+            <label class="field"><span>Minimum increment</span>
+              <span class="input-affix"><span class="money" style="font-size:16px;left:14px">₹</span><input class="input" style="padding-left:32px" id="minIncrement" type="number" min="1" step="1" value="250" /></span>
+              <span class="err" data-err="minIncrement"></span>
+            </label>
+            <div class="field full">
+              <div class="auto-row" style="border-top:0;padding-top:4px">
+                <div>
+                  <div style="font-weight:600;font-size:14px">Hidden reserve price</div>
+                  <div class="small faint">The lot only sells if bidding reaches this. Bidders see "reserve met / not met", never the amount.</div>
+                </div>
+                <label class="switch"><input type="checkbox" id="reserveToggle" /><span class="track"></span></label>
+              </div>
+              <div class="auto-box" id="reserveBox">
+                <div>
+                  <span class="input-affix" style="display:block"><span class="money" style="font-size:16px;left:14px">₹</span><input class="input" style="padding-left:32px" id="reservePrice" type="number" min="1" step="1" placeholder="Reserve amount" /></span>
+                  <span class="err" data-err="reservePrice"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="form-section glass reveal" style="--i:3">
+          <h2><span class="n">3</span>Timing</h2>
+          <p>Every late bid adds 30 seconds, so the real end can be later than this.</p>
+          <div class="field" style="margin-bottom:16px"><span>Duration</span>
+            <div class="chips" id="durationChips">
+              <button type="button" class="chip" data-v="60">1 min</button>
+              <button type="button" class="chip active" data-v="180">3 min</button>
+              <button type="button" class="chip" data-v="600">10 min</button>
+              <button type="button" class="chip" data-v="3600">1 hour</button>
+              <button type="button" class="chip" data-v="86400">1 day</button>
+            </div>
+          </div>
+          <div class="field"><span>Start</span>
+            <div class="chips" id="startChips">
+              <button type="button" class="chip active" data-v="0">Right now</button>
+              <button type="button" class="chip" data-v="60">In 1 min</button>
+              <button type="button" class="chip" data-v="300">In 5 min</button>
+              <button type="button" class="chip" data-v="1800">In 30 min</button>
+            </div>
+          </div>
+          <div class="pill info" style="margin-top:18px" id="timingSummary"></div>
+        </section>
+
+        <div class="row reveal" style="--i:4;justify-content:flex-end;margin-top:18px;gap:12px">
+          <a class="btn btn-lg" href="/">Cancel</a>
+          <button class="btn btn-primary btn-lg" type="submit" id="publishBtn"><span data-icon="sparkle" style="display:flex"></span>Publish lot</button>
+        </div>
+      </form>
+
+      <aside class="preview stack">
+        <div class="label">Live preview</div>
+        <div id="preview" style="pointer-events:none"></div>
+        <div class="glass pad">
+          <div class="label" style="margin-bottom:8px">What happens next</div>
+          <ol class="timeline">
+            <li><span class="dot">1</span><div><b>Goes live instantly</b>Pushed to everyone browsing over WebSockets.</div></li>
+            <li><span class="dot">2</span><div><b>Bidders compete</b>Auto-bids answer instantly; late bids extend the clock.</div></li>
+            <li><span class="dot">3</span><div><b>Server closes it</b>Exactly once, at the server's deadline. One winner.</div></li>
+          </ol>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script type="module" src="/js/sell.js"></script>
+</body>
+</html>

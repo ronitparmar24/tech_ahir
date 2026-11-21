@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>System · Lotline</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/app.css" />
+  <link rel="stylesheet" href="/css/pages.css" />
+</head>
+<body>
+  <div class="backdrop" aria-hidden="true"><i></i><i></i><i></i></div>
+
+  <main class="wrap">
+    <div class="reveal" style="margin:10px 0 24px">
+      <span class="eyebrow"><span class="dot"></span>Live engine telemetry</span>
+      <h1 class="display" style="font-size:clamp(2rem,4vw,3.1rem);margin-top:14px">Under the <span class="grad">hood</span></h1>
+      <p class="muted" style="max-width:620px;margin:12px 0 0">Live numbers from the bidding engine, plus a stress test that fires hundreds of simultaneous bids through the real HTTP stack and then re-checks every invariant.</p>
+    </div>
+
+    <div class="tiles reveal" style="--i:1">
+      <div class="tile glass"><div class="label"><span data-icon="bolt" style="display:flex"></span>Bids / sec</div><div class="value" id="kBps">0</div><div class="sub" id="kBpm">0 in the last minute</div></div>
+      <div class="tile glass"><div class="label"><span data-icon="clock" style="display:flex"></span>Engine latency</div><div class="value" id="kP50">0µs</div><div class="sub" id="kP99">p99 0µs</div></div>
+      <div class="tile glass"><div class="label"><span data-icon="users" style="display:flex"></span>Live sockets</div><div class="value" id="kSockets">0</div><div class="sub" id="kMem">0 MB memory</div></div>
+      <div class="tile glass"><div class="label"><span data-icon="layers" style="display:flex"></span>Auctions</div><div class="value" id="kOpen">0</div><div class="sub" id="kAuctions">0 total</div></div>
+      <div class="tile glass"><div class="label"><span data-icon="database" style="display:flex"></span>Events logged</div><div class="value" id="kEvents">0</div><div class="sub" id="kRestored">durable command log</div></div>
+      <div class="tile glass"><div class="label"><span data-icon="server" style="display:flex"></span>Uptime</div><div class="value" id="kUptime">0s</div><div class="sub" id="kTotals">0 accepted · 0 rejected</div></div>
+    </div>
+
+    <div class="sys-grid">
+      <section class="glass pad-lg reveal" style="--i:2">
+        <div class="row between">
+          <div><div class="label">Throughput</div><div class="h3" style="margin-top:4px">Bids per second · last 60s</div></div>
+          <span class="pill info" id="extTotal">0 extensions</span>
+        </div>
+        <svg class="spark" id="spark" viewBox="0 0 600 160" preserveAspectRatio="none" aria-label="Bids per second chart">
+          <path class="area" d="" /><path class="line" d="" />
+        </svg>
+        <div class="row between tiny faint"><span>60s ago</span><span id="sparkMax">peak 0/s</span><span>now</span></div>
+      </section>
+
+      <section class="glass pad-lg reveal" style="--i:3">
+        <div class="label">Stress test</div>
+        <div class="h3" style="margin:4px 0 14px">Fire simultaneous bids at one lot</div>
+        <label class="field" style="margin-bottom:12px"><span>Target lot</span><select class="select" id="target"></select></label>
+        <div class="field" style="margin-bottom:16px"><span>Simultaneous bids</span>
+          <div class="chips" id="counts">
+            <button type="button" class="chip" data-v="100">100</button>
+            <button type="button" class="chip active" data-v="300">300</button>
+            <button type="button" class="chip" data-v="1000">1,000</button>
+          </div>
+        </div>
+        <button class="btn btn-primary btn-block" id="run"><span data-icon="play" style="display:flex"></span>Run stress test</button>
+        <div id="stressOut"></div>
+        <div id="botsSlot" style="margin-top:6px"></div>
+      </section>
+    </div>
+
+    <section class="glass pad-lg reveal" style="--i:4;margin-top:18px" id="dbPanel">
+      <div class="row between wrap-row">
+        <div>
+          <div class="label">Database</div>
+          <div class="h3" style="margin-top:4px" id="dbEngine">SQLite</div>
+        </div>
+        <span class="pill info" id="dbFile">—</span>
+      </div>
+      <div class="db-meta">
+        <div><b id="dbAuctions">0</b><span>rows in <code>auctions</code></span></div>
+        <div><b id="dbBids">0</b><span>rows in <code>bids</code></span></div>
+        <div><b id="dbUsers">0</b><span>rows in <code>users</code></span></div>
+        <div><b id="dbCommands">0</b><span>rows in <code>commands</code> (log)</span></div>
+      </div>
+      <div class="small faint" style="margin-top:16px">Latest rows in <code>bids</code>, read straight from the database:</div>
+      <div class="table-scroll">
+        <table class="db-table">
+          <thead><tr><th>Lot</th><th class="r">Seq</th><th>Bidder</th><th class="r">Amount</th><th>Type</th><th class="r">When</th></tr></thead>
+          <tbody id="dbRows"><tr><td colspan="6" class="faint">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="glass pad-lg reveal" style="--i:5;margin-top:18px">
+      <div class="label">Architecture at scale</div>
+      <div class="h3" style="margin-top:4px">50,000 auctions · 200,000 watchers on one lot</div>
+      <div class="arch">
+        <div class="node"><span data-icon="users"></span><b>Clients</b><span>REST for bids, WebSocket for updates</span></div>
+        <div class="arrow"><span data-icon="arrow"></span></div>
+        <div class="node"><span data-icon="server"></span><b>WS gateways ×20</b><span>~10k sockets each, stateless</span></div>
+        <div class="arrow"><span data-icon="arrow"></span></div>
+        <div class="node"><span data-icon="layers"></span><b>Pub/Sub</b><span>Redis / NATS, 1 channel per lot</span></div>
+        <div class="arrow"><span data-icon="arrow"></span></div>
+        <div class="node"><span data-icon="gavel"></span><b>Lot owners</b><span>sharded by lot id, single writer</span></div>
+        <div class="arrow"><span data-icon="arrow"></span></div>
+        <div class="node"><span data-icon="database"></span><b>Bid log</b><span>append-only, replayable</span></div>
+      </div>
+      <ul class="notes">
+        <li><b>One owner per auction.</b> Lots are sharded by id; every bid for a lot goes to one writer (Redis Lua script or one Kafka partition). No distributed locks, and lots run in parallel.</li>
+        <li><b>The bid check is one atomic step.</b> Check open, check ≥ price + increment, resolve auto-bids, write, extend the deadline. All in one step, so two bids can never both see the old price.</li>
+        <li><b>The server clock decides.</b> The deadline is checked inside that same step. A timer closes the lot exactly once; a late timer can't let a bid in after the end.</li>
+        <li><b>Fan-out separated from bidding.</b> Owners publish to pub/sub; stateless gateways push to watchers, coalesced to ≤10 msgs/sec per lot with full state, so 200k watchers cost one fan-out per batch.</li>
+        <li><b>Durable, auditable log.</b> Commands are appended before acknowledging; a crashed owner replays the log to rebuild the exact same state (try restarting the server).</li>
+        <li><b>Safety at the edges.</b> Idempotent bid ids for retries, per-bidder rate limits, integer money, and authentication at the gateway.</li>
+      </ul>
+    </section>
+  </main>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script type="module" src="/js/system.js"></script>
+</body>
+</html>
